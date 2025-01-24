@@ -10,7 +10,7 @@ You can try the experimental web browser version here: [playjs.purei.org](https:
 
 For general discussion, you're welcome to join our Discord: https://discord.gg/HygQnQP.
 
-## Running on iOS ##
+##    Running on iOS ##
 
 This emulator uses JIT code generation to speed things up. This is not supported by default by iOS, thus, there are some extra requirements:
 
