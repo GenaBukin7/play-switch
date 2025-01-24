@@ -1,0 +1,47 @@
+name: Build Play-Switch
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install devkitPro
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential wget
+        wget https://apt.devkitpro.org/install-devkitpro-pacman
+        chmod +x install-devkitpro-pacman
+        sudo ./install-devkitpro-pacman
+        echo "export DEVKITPRO=/opt/devkitpro" >> $GITHUB_ENV
+        echo "export DEVKITARM=/opt/devkitpro/devkitARM" >> $GITHUB_ENV
+        echo "export DEVKITA64=/opt/devkitpro/devkitA64" >> $GITHUB_ENV
+
+    - name: Install switch-tools
+      run: |
+        source $GITHUB_ENV
+        sudo dkp-pacman -Syu --noconfirm switch-dev switch-cmake switch-mesa switch-libdrm_nouveau
+
+    - name: Build project
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Switch.cmake ..
+        make -j$(nproc)
+
+    - name: Upload artifacts
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: play-switch-build
+        path: build/
